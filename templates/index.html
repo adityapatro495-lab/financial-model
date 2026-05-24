@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Financial Forecast Calculator</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: #eef3fb;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #0078D7, #00A4EF);
+            color: white;
+            padding: 35px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: 36px;
+        }
+
+        .hero p {
+            margin-top: 12px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #0078D7;
+        }
+
+        .section-desc {
+            color: #6b7280;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        label {
+            width: 230px;
+            font-weight: 600;
+        }
+
+        input[type=range] {
+            flex: 1;
+            min-width: 250px;
+            accent-color: #0078D7;
+        }
+
+        input[type=number] {
+            width: 150px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            font-size: 15px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        button {
+            border: none;
+            padding: 14px 22px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .primary-btn {
+            background: #0078D7;
+            color: white;
+        }
+
+        .secondary-btn {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        #results {
+            margin-top: 40px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: #0078D7;
+            color: white;
+            padding: 12px;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: center;
+        }
+
+        canvas {
+            margin-top: 25px;
+        }
+
+        @media (max-width: 768px) {
+
+            .input-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            label {
+                width: 100%;
+            }
+
+            input[type=number] {
+                width: 100%;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="hero">
+        <h1>Financial Forecast Calculator</h1>
+        <p>
+            Forecast your long-term wealth growth across Equity, FD, Bonds, Gold,
+            and evaluate retirement sustainability using SWP projections.
+        </p>
+    </div>
+
+    <form id="forecastForm">
+
+        <!-- EQUITY -->
+
+        <div class="card">
+
+            <h2>Equity</h2>
+
+            <p class="section-desc">
+                Configure your stock or mutual fund portfolio assumptions.
+            </p>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label>Opening Investment</label>
+                    <input type="range" id="equity_opening_slider" min="0" max="10000000" step="1000" value="0">
+                    <input type="number" id="equity_opening_number" name="equity_opening" value="0">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label>Monthly SIP</label>
+                    <input type="range" id="equity_monthly_slider" min="0" max="200000" step="500" value="0">
+                    <input type="number" id="equity_monthly_number" name="equity_monthly" value="0">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label>Expected CAGR %</label>
+                    <input type="range" id="equity_cagr_slider" min="0" max="25" step="0.1" value="0">
+                    <input type="number" id="equity_cagr_number" name="equity_cagr" value="0">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FD -->
+
+        <div class="card">
+
+            <h2>Fixed Deposit (FD)</h2>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label>Opening Investment</label>
+                    <input type="range" id="fd_opening_slider" min="0" max="10000000" step="1000" value="0">
+                    <input type="number" id="fd_opening_number" name="fd_opening" value="0">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label>Monthly Deposit</label>
+                    <input type="range" id="fd_monthly_slider" min="0" max="100000" step="500" value="0">
+                    <input type="number" id="fd_monthly_number" name="fd_monthly" value="0">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label>Interest Rate %</label>
+                    <input type="range" id="fd_cagr_slider" min="0" max="15" step="0.1" value="0">
+                    <input type="number" id="fd_cagr_number" name="fd_cagr" value="0">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- BONDS -->
+
+        <div class="card">
+
+            <h2>Bonds</h2>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label>Opening Investment</label>
+                    <input type="range" id="bonds_opening_slider" min="0" max="10000000" step="1000" value="0">
+                    <input type="number" id="bonds_opening_number" name="bonds_opening" value="0">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label>Monthly Contribution</label>
+                    <input type="range" id="bonds_monthly_slider" min="0" max="100000" step="500" value="0">
+                    <input type="number" id="bonds_monthly_number" name="bonds_monthly" value="0">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label>Yield %</label>
+                    <input type="range" id="bonds_cagr_slider" min="0" max="20" step="0.1" value="0">
+                    <input type="number" id="bonds_cagr_number" name="bonds_cagr" value="0">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- GOLD -->
+
+        <div class="card">
+
+            <h2>Gold & Silver</h2>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label>Opening Investment</label>
+                    <input type="range" id="gold_opening_slider" min="0" max="10000000" step="1000" value="0">
+                    <input type="number" id="gold_opening_number" name="gold_opening" value="0">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label>Monthly Purchase</label>
+                    <input type="range" id="gold_monthly_slider" min="0" max="100000" step="500" value="0">
+                    <input type="number" id="gold_monthly_number" name="gold_monthly" value="0">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label>Growth Rate %</label>
+                    <input type="range" id="gold_cagr_slider" min="0" max="20" step="0.1" value="0">
+                    <input type="number" id="gold_cagr_number" name="gold_cagr" value="0">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- GENERAL -->
+
+        <div class="card">
+
+            <h2>General Parameters</h2>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label>Forecast Years</label>
+                    <input type="range" id="years_slider" min="1" max="50" step="1" value="10">
+                    <input type="number" id="years_number" name="years" value="10">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SWP -->
+
+        <div class="card">
+
+            <h2>SWP Parameters</h2>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label>Corpus Reduction Tax %</label>
+                    <input type="range" id="tax_rate_slider" min="0" max="30" step="0.1" value="0">
+                    <input type="number" id="tax_rate_number" name="tax_rate" value="0">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label>Annual Withdrawal</label>
+                    <input type="range" id="withdraw_amount_slider" min="0" max="5000000" step="10000" value="0">
+                    <input type="number" id="withdraw_amount_number" name="withdraw_amount" value="0">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label>Withdrawal Increase %</label>
+                    <input type="range" id="withdraw_increase_slider" min="0" max="15" step="0.1" value="5">
+                    <input type="number" id="withdraw_increase_number" name="withdraw_increase" value="5">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-row">
+                    <label>SWP Growth Rate %</label>
+                    <input type="range" id="growth_rate_slider" min="0" max="20" step="0.1" value="10">
+                    <input type="number" id="growth_rate_number" name="growth_rate" value="10">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="buttons">
+            <button type="submit" class="primary-btn">Run Forecast</button>
+            <button type="reset" class="secondary-btn">Reset</button>
+        </div>
+
+    </form>
+
+    <div id="results"></div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+</body>
+
+</html>
